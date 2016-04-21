@@ -6,7 +6,7 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "cfenv": "1.0.x",
+    "cfenv": "^1.0.3",
     "express": "4.13.x",
     "socket.io": "^1.4.5"
   },
