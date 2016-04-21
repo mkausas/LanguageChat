@@ -5,6 +5,17 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
 
+
+var watson = require('watson-developer-cloud');
+var language_translation = watson.language_translation({
+  username: 'b9f3a674-63bb-41a2-aaa1-caf7af87b304',
+  password: 'y75Z94jDkmNr',
+  version: 'v2'
+});
+
+
+
+
 // cfenv provides access to your Cloud Foundry environment
 // for more info, see: https://www.npmjs.com/package/cfenv
 var cfenv = require('cfenv');
@@ -28,11 +39,50 @@ io.on('connection', function (socket) {
 
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
-    // we tell the client to execute 'new message'
-    socket.broadcast.emit('new message', {
-      username: socket.username,
-      message: data
+
+
+
+    console.log("this shit should work, data = " + data);
+    var translatedMessage = "";
+    language_translation.identify({ text: data},
+      function(err, identifiedLanguages) {
+        if (err)
+          console.log(err)
+        else {
+          var lang = identifiedLanguages["languages"][0]["language"];
+          console.log(identifiedLanguages["languages"][0]["language"])
+          // console.log(identifiedLanguages[0])
+
+          language_translation.translate({
+              text: data,
+              source: lang,
+              target: 'es'
+            }, function(err, translation) {
+              if (err)
+                console.log(err);
+              else {
+                console.log(translation);
+                data = translation["translations"][0]["translation"];
+                console.log(data)
+              
+                console.log("SENDING data = " + data)
+                // we tell the client to execute 'new message'
+                socket.broadcast.emit('new message', {
+                  username: socket.username,
+                  message: data
+                });
+
+
+              }
+          });
+        }
+
+          // console.log(identifiedLanguages[0]["language"]);
     });
+
+
+
+
   });
 
   // when the client emits 'add user', this listens and executes

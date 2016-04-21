@@ -7,6 +7,9 @@ $(function() {
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
   ];
 
+
+
+
   // Initialize variables
   var $window = $(window);
   var $usernameInput = $('.usernameInput'); // Input for username
@@ -87,6 +90,7 @@ $(function() {
     var $usernameDiv = $('<span class="username"/>')
       .text(data.username)
       .css('color', getUsernameColor(data.username));
+
     var $messageBodyDiv = $('<span class="messageBody">')
       .text(data.message);
 
@@ -238,6 +242,7 @@ $(function() {
 
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
+    console.log("front end = " + data.message)
     addChatMessage(data);
   });
 
