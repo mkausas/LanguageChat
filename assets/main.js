@@ -7,9 +7,6 @@ $(function() {
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
   ];
 
-
-
-
   // Initialize variables
   var $window = $(window);
   var $usernameInput = $('.usernameInput'); // Input for username
@@ -49,8 +46,13 @@ $(function() {
       $loginPage.off('click');
       $currentInput = $inputMessage.focus();
 
+
+      var e = document.getElementById("langPick");
+      var lang = e.options[e.selectedIndex].value;
+
+
       // Tell the server your username
-      socket.emit('add user', username);
+      socket.emit('add user', username + "[[" + socket.id + "[[" + lang);
     }
   }
 

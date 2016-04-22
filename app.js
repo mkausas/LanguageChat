@@ -13,7 +13,8 @@ var language_translation = watson.language_translation({
   version: 'v2'
 });
 
-
+// store ex. ["SOCKET_ID": "en"]
+var socketLanguages = {};
 
 
 // cfenv provides access to your Cloud Foundry environment
@@ -41,45 +42,65 @@ io.on('connection', function (socket) {
   socket.on('new message', function (data) {
 
 
+    // console.log("socket languages " + socketLanguages)
+    // console.log("io.sockets " + io.sockets)
 
-    console.log("this shit should work, data = " + data);
-    var translatedMessage = "";
-    language_translation.identify({ text: data},
-      function(err, identifiedLanguages) {
-        if (err)
-          console.log(err)
-        else {
-          console.log(identifiedLanguages)
-          var lang = identifiedLanguages["languages"][0]["language"];
-          console.log(identifiedLanguages["languages"][0]["language"])
-          // console.log(identifiedLanguages[0])
+    // for (client in io.sockets) {
+    //   console.log("client " + socketLanguages)
 
-          language_translation.translate({
-              text: data,
-              source: lang,
-              target: 'es'
-            }, function(err, translation) {
-              if (err){
-                console.log(err)
-              }
-              else {
-                data = translation["translations"][0]["translation"];
-                console.log(data)
-              }
+      console.log("socket = " + socket)
+      console.log("socket id = " + socket.id)
+      console.log("socket lang = " + socketLanguages[socket.id])
 
-              console.log("SENDING data = " + data)
-              // we tell the client to execute 'new message'
-              socket.broadcast.emit('new message', {
-                username: socket.username,
-                message: data
-              });
-          });
-        }
+      language_translation.identify({ text: data},
+        function(err, identifiedLanguages) {
+          if (err)
+            console.log(err)
+          else {
+            var lang = identifiedLanguages["languages"][0]["language"];
 
-          // console.log(identifiedLanguages[0]["language"]);
-    });
+            // var currClientID = client;
+            // var currLang = socketLanguages[client]; 
+            // console.log("client = " + client + " wants " + currLang)
+
+            language_translation.translate({
+                text: data,
+                source: lang,
+                target: socketLanguages[socket.id] 
+              }, function(err, translation) {
+                if (err){
+                  console.log(err)
+                }
+                else {
+                  data = translation["translations"][0]["translation"];
+                }
+
+                console.log("SENDING data = " + data)
+                // we tell the client to execute 'new message'
+                socket.broadcast.emit('new message', {
+                  username: socket.username,
+                  message: data
+                });
+
+                // if (io.sockets.connected[currClientID]) {
+                    // console.log("sending to " + currClientID)
+                    
+                    // console.log(io.sockets[currClientID]);
+                // io.sockets.connected["/#" + currClientID].emit('new message', data);
+                // io.to("/#" + currClientID).emit('new message', data);
+                // io.to("/#" + currClientID).emit('new message', data);
+
+                // } else {
+                //   console.log("not connected");
+                // }
+                // console.log("sending to /#" + currClientID)
 
 
+            });
+          }
+
+      });
+    // }
 
 
   });
@@ -87,6 +108,20 @@ io.on('connection', function (socket) {
   // when the client emits 'add user', this listens and executes
   socket.on('add user', function (username) {
     if (addedUser) return;
+
+    var clients = io.sockets.clients();
+    console.log(clients);
+
+    console.log("user id = " + username);
+
+    var items = username.split("[[");
+    var clientID = "/#" + items[1];
+    var clientLang = items[2];
+    username = items[0];
+
+    socketLanguages[clientID] = clientLang;
+    console.log(socketLanguages)
+
 
     // we store the username in the socket session for this client
     socket.username = username;
