@@ -10,37 +10,41 @@
   /* When the user clicks on the button, 
   toggle between hiding and showing the dropdown content */
   function myFunction() {
-      document.getElementById("myDropdown").classList.toggle("show");
-  }
+      var e = document.getElementById("langPick");
+      var lang = e.options[e.selectedIndex].value;
+      console.log(lang)
 
-  // Close the dropdown menu if the user clicks outside of it
-  window.onclick = function(event) {
-    if (!event.target.matches('.dropbtn')) {
-
-      var dropdowns = document.getElementsByClassName("dropdown-content");
-      var i;
-      for (i = 0; i < dropdowns.length; i++) {
-        var openDropdown = dropdowns[i];
-        if (openDropdown.classList.contains('show')) {
-          openDropdown.classList.remove('show');
-        }
-      }
-    }
   }
   </script>
 </head>
 <body>
 
-  <div class="dropdown">
-    <button onclick="myFunction()" class="dropbtn">Dropdown</button>
-    <div id="myDropdown" class="dropdown-content">
-      <a href="#">Link 1</a>
-      <a href="#">Link 2</a>
-      <a href="#">Link 3</a>
-    </div>
-  </div>
+  <select id="langPick" id="myDropdown" onchange="myFunction()">
+    <option value="en">English</option>
+    <option value="es">Spanish</option>
+    <option value="fr">French</option>
+  </select>
 
-  
+  <!-- <div class="dropdown">
+    <button onclick="myFunction()" class="dropbtn">Pick a Language</button>
+    <div id="myDropdown" class="dropdown-content">
+      <a href="#">English</a>
+      <a href="#">Spanish</a>
+      <a href="#">French</a>
+      <a href="#">Egyptian</a>
+      <a href="#">Italian</a>
+      <a href="#">Portugese</a>
+    </div>
+  </div> -->
+
+<!-- Arabic
+Egyptian
+English
+Spanish
+French
+Italian
+Portuguese
+ -->
   <ul class="pages">
     <li class="chat page">
       <div class="chatArea">

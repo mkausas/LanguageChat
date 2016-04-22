@@ -49,6 +49,7 @@ io.on('connection', function (socket) {
         if (err)
           console.log(err)
         else {
+          console.log(identifiedLanguages)
           var lang = identifiedLanguages["languages"][0]["language"];
           console.log(identifiedLanguages["languages"][0]["language"])
           // console.log(identifiedLanguages[0])
@@ -58,22 +59,20 @@ io.on('connection', function (socket) {
               source: lang,
               target: 'es'
             }, function(err, translation) {
-              if (err)
-                console.log(err);
+              if (err){
+                console.log(err)
+              }
               else {
-                console.log(translation);
                 data = translation["translations"][0]["translation"];
                 console.log(data)
-              
-                console.log("SENDING data = " + data)
-                // we tell the client to execute 'new message'
-                socket.broadcast.emit('new message', {
-                  username: socket.username,
-                  message: data
-                });
-
-
               }
+
+              console.log("SENDING data = " + data)
+              // we tell the client to execute 'new message'
+              socket.broadcast.emit('new message', {
+                username: socket.username,
+                message: data
+              });
           });
         }
 
