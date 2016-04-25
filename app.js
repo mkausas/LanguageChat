@@ -40,9 +40,7 @@ io.on('connection', function(socket) {
     // when the client emits 'new message', this listens and executes
     socket.on('new message', function(data) {
 
-
-
-        console.log("this shit should work, data = " + data);
+        console.log("should this work, data = " + data);
         var translatedMessage = "";
         language_translation.identify({
                 text: data
@@ -58,12 +56,12 @@ io.on('connection', function(socket) {
                     language_translation.translate({
                         text: data,
                         source: lang,
-                        target: 'es'
+                        target: 'en'
                     }, function(err, translation) {
                         if (err)
                             console.log(err);
                         else {
-                            console.log(translation);
+                            console.log("translation: " + translation);
                             data = translation["translations"][0]["translation"];
                             console.log(data)
 
@@ -73,18 +71,12 @@ io.on('connection', function(socket) {
                                 username: socket.username,
                                 message: data
                             });
-
-
                         }
                     });
                 }
 
                 // console.log(identifiedLanguages[0]["language"]);
             });
-
-
-
-
     });
 
     // when the client emits 'add user', this listens and executes

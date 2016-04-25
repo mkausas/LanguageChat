@@ -97,6 +97,8 @@ $(function() {
 
         var $messageBodyDiv = $('<span class="messageBody">')
             .text(data.message);
+            // console.log("msg body div: " + $messageBodyDiv);
+            // console.log(data.message);
 
         var typingClass = data.typing ? 'typing' : '';
         var $messageDiv = $('<li class="message"/>')
