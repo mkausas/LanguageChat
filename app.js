@@ -58,9 +58,15 @@ io.on('connection', function(socket) {
                         source: lang,
                         target: 'en'
                     }, function(err, translation) {
-                        if (err)
+                        if (err) {
                             console.log(err);
-                        else {
+							socket.broadcast.emit('new message', {
+                                username: socket.username,
+                                message: data
+                            });
+
+						
+						} else {
                             console.log("translation: " + translation);
                             data = translation["translations"][0]["translation"];
                             console.log(data)
