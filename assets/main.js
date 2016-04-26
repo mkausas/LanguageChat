@@ -1,3 +1,18 @@
+
+var socket = io();
+
+function onSelect() {
+	socket.emit('set lang', getSelectedLang());	
+}
+
+
+function getSelectedLang() {
+	var e = document.getElementById("langPick");
+	var lang = e.options[e.selectedIndex].value;
+	console.log(lang);
+	return lang;
+}
+
 $(function() {
     var FADE_TIME = 150; // ms
     var TYPING_TIMER_LENGTH = 400; // ms
@@ -6,8 +21,8 @@ $(function() {
         '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
         '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
     ];
-
-
+	
+	
 
 
     // Initialize variables
@@ -26,7 +41,6 @@ $(function() {
     var lastTypingTime;
     var $currentInput = $usernameInput.focus();
 
-    var socket = io();
 
     function addParticipantsMessage(data) {
         var message = '';
@@ -256,7 +270,12 @@ $(function() {
     // Whenever the server emits 'new message', update the chat body
     socket.on('new message', function(data) {
         console.log("front end = " + data.message)
-        addChatMessage(data);
+		var split = data.message.split("*__*");
+		console.log(getSelectedLang() + " " + split); 
+		if (getSelectedLang() == split[0]) {
+	        data.message = split[1];
+            addChatMessage(data);
+		}
     });
 
     // Whenever the server emits 'user joined', log it in the chat body
@@ -281,4 +300,5 @@ $(function() {
     socket.on('stop typing', function(data) {
         removeChatTyping(data);
     });
+
 });

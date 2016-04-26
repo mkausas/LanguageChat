@@ -15,6 +15,34 @@ var language_translation = watson.language_translation({
 
 
 
+function translateAndSend(data, from, to, socket) {
+    language_translation.translate({
+        text: data,
+        source: from,
+        target: to 
+    }, function(err, translation) {
+        if (err) {
+            //console.log(err);
+            socket.broadcast.emit('new message', {
+                username: socket.username,
+                message: to +  "*__*" + data
+            });
+
+        
+        } else {
+            console.log("translation: " + translation);
+            data = translation["translations"][0]["translation"];
+            console.log(data)
+
+            console.log("SENDING data = " + data)
+            // we tell the client to execute 'new message'
+            socket.broadcast.emit('new message', {
+                username: socket.username,
+                message: to + "*__*" + data
+            });
+        }
+    });
+}
 
 // cfenv provides access to your Cloud Foundry environment
 // for more info, see: https://www.npmjs.com/package/cfenv
@@ -31,11 +59,12 @@ app.use(express.static(__dirname + '/assets'));
 var appEnv = cfenv.getAppEnv();
 
 // Chatroom
-
 var numUsers = 0;
+var languages = ["en"];
 
 io.on('connection', function(socket) {
     var addedUser = false;
+
 
     // when the client emits 'new message', this listens and executes
     socket.on('new message', function(data) {
@@ -51,34 +80,14 @@ io.on('connection', function(socket) {
                 else {
                     var lang = identifiedLanguages["languages"][0]["language"];
                     console.log(identifiedLanguages["languages"][0]["language"])
-                    // console.log(identifiedLanguages[0])
+					
+					var langIndex = 0;
+					for (language in languages) {
+						language = languages[language];
+						console.log("sending in " + language);
 
-                    language_translation.translate({
-                        text: data,
-                        source: lang,
-                        target: 'en'
-                    }, function(err, translation) {
-                        if (err) {
-                            console.log(err);
-							socket.broadcast.emit('new message', {
-                                username: socket.username,
-                                message: data
-                            });
-
-						
-						} else {
-                            console.log("translation: " + translation);
-                            data = translation["translations"][0]["translation"];
-                            console.log(data)
-
-                            console.log("SENDING data = " + data)
-                            // we tell the client to execute 'new message'
-                            socket.broadcast.emit('new message', {
-                                username: socket.username,
-                                message: data
-                            });
-                        }
-                    });
+						translateAndSend(data, lang, language, socket);
+					}
                 }
 
                 // console.log(identifiedLanguages[0]["language"]);
@@ -109,6 +118,14 @@ io.on('connection', function(socket) {
             username: socket.username
         });
     });
+
+    socket.on('set lang', function(data) {
+    	console.log(data);
+    	if (languages.indexOf(data) == -1) {
+			languages.push(data);
+			console.log(languages);
+		}
+	});
 
     // when the client emits 'stop typing', we broadcast it to others
     socket.on('stop typing', function() {
